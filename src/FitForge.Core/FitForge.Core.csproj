@@ -7,4 +7,8 @@
     <RootNamespace>FitForge.Core</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FitForge.Shared\FitForge.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
