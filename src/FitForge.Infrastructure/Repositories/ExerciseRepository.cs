@@ -50,6 +50,39 @@ public class ExerciseRepository : IExerciseRepository
         return Result<IReadOnlyList<Exercise>>.Success(exercises);
     }
 
+    public async Task<Result<IReadOnlyList<Exercise>>> SearchAsync(string query)
+    {
+        var exercises = await _context.Exercises
+            .Where(e => e.Name.Contains(query) ||
+                       (e.Instructions != null && e.Instructions.Contains(query)))
+            .OrderBy(e => e.Name)
+            .ToListAsync();
+        return Result<IReadOnlyList<Exercise>>.Success(exercises);
+    }
+
+    public async Task<Result<IReadOnlyList<Exercise>>> FilterAsync(
+        ExerciseCategory? category,
+        DifficultyLevel? difficulty,
+        string? equipment)
+    {
+        var query = _context.Exercises.AsQueryable();
+
+        if (category.HasValue)
+            query = query.Where(e => e.Category == category.Value);
+
+        if (difficulty.HasValue)
+            query = query.Where(e => e.Difficulty == difficulty.Value);
+
+        if (!string.IsNullOrEmpty(equipment))
+            query = query.Where(e => e.Equipment != null && e.Equipment.Contains(equipment));
+
+        var exercises = await query
+            .OrderBy(e => e.Name)
+            .ToListAsync();
+
+        return Result<IReadOnlyList<Exercise>>.Success(exercises);
+    }
+
     public async Task<Result<Exercise>> CreateAsync(Exercise exercise)
     {
         _context.Exercises.Add(exercise);

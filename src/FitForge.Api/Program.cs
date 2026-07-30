@@ -2,6 +2,7 @@ using System.Text;
 using FitForge.Api.Middleware;
 using FitForge.Infrastructure;
 using FitForge.Infrastructure.Data;
+using FluentValidation.AspNetCore;
 using HealthChecks.NpgSql;
 using HealthChecks.RabbitMQ;
 using HealthChecks.Redis;
@@ -41,6 +42,10 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
+// FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 // Health Checks
 builder.Services.AddHealthChecks()

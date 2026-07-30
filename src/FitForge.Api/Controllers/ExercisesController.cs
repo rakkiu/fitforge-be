@@ -77,6 +77,47 @@ public sealed class ExercisesController : ControllerBase
                 title: onFailure.Code));
     }
 
+    [Authorize]
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string q)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+            return BadRequest(new { error = "Search query is required" });
+
+        var result = await _exerciseRepository.SearchAsync(q);
+        return result.Match<IActionResult>(
+            onSuccess => Ok(result.Value!.Select(MapToResponse)),
+            onFailure => Problem(
+                detail: onFailure.Message,
+                statusCode: MapErrorToStatusCode(onFailure.Type),
+                title: onFailure.Code));
+    }
+
+    [Authorize]
+    [HttpGet("filter")]
+    public async Task<IActionResult> Filter(
+        [FromQuery] string? category = null,
+        [FromQuery] string? difficulty = null,
+        [FromQuery] string? equipment = null)
+    {
+        ExerciseCategory? categoryEnum = null;
+        DifficultyLevel? difficultyEnum = null;
+
+        if (!string.IsNullOrEmpty(category) && Enum.TryParse<ExerciseCategory>(category, true, out var cat))
+            categoryEnum = cat;
+
+        if (!string.IsNullOrEmpty(difficulty) && Enum.TryParse<DifficultyLevel>(difficulty, true, out var diff))
+            difficultyEnum = diff;
+
+        var result = await _exerciseRepository.FilterAsync(categoryEnum, difficultyEnum, equipment);
+        return result.Match<IActionResult>(
+            onSuccess => Ok(result.Value!.Select(MapToResponse)),
+            onFailure => Problem(
+                detail: onFailure.Message,
+                statusCode: MapErrorToStatusCode(onFailure.Type),
+                title: onFailure.Code));
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateExerciseRequest request)
