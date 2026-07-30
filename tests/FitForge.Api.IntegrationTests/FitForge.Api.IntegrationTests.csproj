@@ -26,4 +26,8 @@
     <ProjectReference Include="..\..\src\FitForge.Api\FitForge.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\src\FitForge.Api\appsettings.Testing.json" CopyToOutputDirectory="PreserveNewest" Link="appsettings.Testing.json" />
+  </ItemGroup>
+
 </Project>
